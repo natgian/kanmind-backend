@@ -18,6 +18,12 @@ env/
 .env
 .env.*
 
+# Django
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+
 # Distribution / Packaging
 dist/
 build/
