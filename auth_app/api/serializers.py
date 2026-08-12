@@ -4,8 +4,7 @@ from rest_framework import serializers
 User = get_user_model()
 
 class RegistrationSerializer(serializers.ModelSerializer):
-  """Validates and creates a new user."""
-
+  """Validate and create a new user."""
   repeated_password = serializers.CharField(write_only=True)
 
   class Meta:
@@ -14,27 +13,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
     extra_kwargs = {"password": {"write_only": True}}
 
   def validate(self, data):
-    """
-    Checks that the two password fields match.
-    """
-
+    """Check that the two password fields match."""
     if data["password"] != data["repeated_password"]:
-      raise serializers.ValidationError({"password:" "Passwords do not match."})
+      raise serializers.ValidationError({"password": "Passwords do not match."})
     return data
 
   def create(self, validated_data):
-    """
-    Creates amd returns a new User with email as username.
-    """
-
+    """Create and return a new user with email as username."""
     validated_data.pop("repeated_password")
-
-    user = User.objects.create_user(
-      username=validated_data["email"],
-      email=validated_data["email"],
-      fullname=validated_data["fullname"],
-      password=validated_data["password"]
-    )
+    user = User.objects.create_user(**validated_data)
     return user
 
   
