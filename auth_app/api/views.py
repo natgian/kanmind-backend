@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, LoginSerializer
 
 class RegistrationView(APIView):
   """API endpoint for creating a new user and returning a token."""
@@ -20,7 +21,7 @@ class RegistrationView(APIView):
       # Generate token for the new user
       token, created = Token.objects.get_or_create(user=user)
 
-      # Structure response data
+      # Structured response data
       response_data = {
         "token":token.key,
         "fullname": user.fullname,
@@ -28,5 +29,29 @@ class RegistrationView(APIView):
         "user_id": user.id
       }
       return Response(response_data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(APIView):
+  """API endpoint for user login."""
+  permission_classes = [AllowAny]
+  # Configure serializer for this view
+  serializer_class = LoginSerializer
+
+  def post(self, request, *args, **kwargs):
+    serializer = self.serializer_class(data=request.data, context={'request': request})
+
+    if serializer.is_valid():
+      user = serializer.validated_data["user"]
+      token, created = Token.objects.get_or_create(user=user)
+
+      # Structured response data
+      response_data = {
+        "token": token.key,
+        "fullname": user.fullname,
+        "email": user.email,
+        "user_id": user.id
+      }
+      return Response(response_data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
