@@ -34,11 +34,9 @@ class RegistrationView(APIView):
 class LoginView(APIView):
   """API endpoint for user login."""
   permission_classes = [AllowAny]
-  # Configure serializer for this view
-  serializer_class = LoginSerializer
 
   def post(self, request, *args, **kwargs):
-    serializer = self.serializer_class(data=request.data, context={"request": request})
+    serializer = LoginSerializer(data=request.data, context={"request": request})
 
     if serializer.is_valid():
       user = serializer.validated_data["user"]
