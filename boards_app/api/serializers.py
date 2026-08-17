@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from models import Board
+from ..models import Board
 
 User = get_user_model()
 
@@ -10,7 +10,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
   Validates incoming member IDs and dynamically computes fields for tasks and member count.
   """
-  members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), required=False)
+  members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), required=False, write_only=True)
   owner_id = serializers.ReadOnlyField(source="owner.id")
   member_count = serializers.SerializerMethodField()
   ticket_count = serializers.SerializerMethodField()
@@ -19,7 +19,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Board
-    fields = ["id", "title", "member_count", "ticket_count", "tasks_to_do_count", "tasks_high_prio_count", "owner_id"]
+    fields = ["id", "title", "members", "member_count", "ticket_count", "tasks_to_do_count", "tasks_high_prio_count", "owner_id"]
 
   def get_member_count(self, obj):
     """Return the total number of members assigned to the board."""
