@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     # Local apps
     'auth_app',
-    'boards_app'
+    'boards_app',
+    'tasks_app'
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,13 @@ AUTH_USER_MODEL = "auth_app.CustomUser"
 CORS_ALLOWED_ORIGINS = [
     "null",
 ]
+
+# Configuration for permission and authentication
+REST_FRAMEWORK = {
+	'DEFAULT_PERMISSION_CLASSES': [
+		'rest_framework.permissions.IsAuthenticated',
+	],
+	'DEFAULT_AUTHENTICATION_CLASSES': [
+		'rest_framework.authentication.TokenAuthentication'
+	]
+}
