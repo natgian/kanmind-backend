@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from ..models import Board
+from auth_app.api.serializers import UserProfileSerializer
+from tasks_app.api.serializers import TaskSerializer
 
 User = get_user_model()
 
@@ -40,6 +42,23 @@ class BoardSerializer(serializers.ModelSerializer):
     board.members.set(members_data)
 
     return board
+
+
+class BoardDetailSerializer(serializers.ModelSerializer):
+  """
+  Serializer for retrieving detailed information of a single board.
+
+  Includes nested representations of assigned board members and associated tasks (with calculated)
+  comment counts).
+  """
+  owner_id = serializers.ReadOnlyField(source="owner.id")
+  members = UserProfileSerializer(many=True, read_only=True)
+  tasks = TaskSerializer(many=True, read_only=True)
+    
+  class Meta:
+    model = Board
+    fields = ["id", "title", "owner_id", "members", "tasks"]
+
 
 
   

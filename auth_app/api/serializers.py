@@ -48,9 +48,9 @@ class LoginSerializer(serializers.Serializer):
     return data
 
 
-  class UserProfileSerializer(serializers.ModelSerializer):
-    """Display user information."""
-    class Meta:
-      model = User
-      fields = ["id", "email", "fullname"]
+class UserProfileSerializer(serializers.ModelSerializer):
+  """Display user information."""
+  class Meta:
+    model = User
+    fields = ["id", "email", "fullname"]
   
