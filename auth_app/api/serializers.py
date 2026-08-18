@@ -46,4 +46,11 @@ class LoginSerializer(serializers.Serializer):
       raise serializers.ValidationError("Both email and password are required.")
 
     return data
+
+
+  class UserProfileSerializer(serializers.ModelSerializer):
+    """Display user information."""
+    class Meta:
+      model = User
+      fields = ["id", "email", "fullname"]
   
