@@ -6,36 +6,21 @@ User = get_user_model()
 
 class BoardSerializer(serializers.ModelSerializer):
   """
-  Serializer for creating and retrieving a board.
+  Serializer for creating a board and listing boards.
 
-  Validates incoming member IDs and dynamically computes fields for tasks and member count.
+  Validates incoming member IDs and maps annotated statistics (like member and task counts) from the database view.
   """
   members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), required=False, write_only=True)
   owner_id = serializers.ReadOnlyField(source="owner.id")
-  member_count = serializers.SerializerMethodField()
-  ticket_count = serializers.SerializerMethodField()
-  tasks_to_do_count = serializers.SerializerMethodField()
-  tasks_high_prio_count = serializers.SerializerMethodField()
+
+  member_count = serializers.ReadOnlyField(source="annotated_member_count")
+  ticket_count = serializers.ReadOnlyField(source="annotated_ticket_count")
+  tasks_to_do_count = serializers.ReadOnlyField(source="annotated_tasks_to_do_count")
+  tasks_high_prio_count = serializers.ReadOnlyField(source="annotated_tasks_high_prio_count")
 
   class Meta:
     model = Board
     fields = ["id", "title", "members", "member_count", "ticket_count", "tasks_to_do_count", "tasks_high_prio_count", "owner_id"]
-
-  def get_member_count(self, obj):
-    """Return the total number of members assigned to the board."""
-    return obj.members.count()
-
-  def get_ticket_count(self, obj):
-    """Return the total number ot tasks (tickets) associated to the board."""
-    return obj.tasks.count()
-
-  def get_tasks_to_do_count(self, obj):
-    """Return the total number of tasks (tickets) associated to the board with the status 'to-do'."""
-    return obj.tasks.filter(status="to-do").count()
-
-  def get_tasks_high_prio_count(self, obj):
-    """Return the total number ot tasks (tickets) associated to the board with the priority 'high'."""
-    return obj.tasks.filter(priority="high").count()
 
   def create(self, validated_data):
     """Create a new board and automatically assign the creator as the owner and as a member of the board."""
