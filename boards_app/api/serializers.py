@@ -60,5 +60,20 @@ class BoardDetailSerializer(serializers.ModelSerializer):
     fields = ["id", "title", "owner_id", "members", "tasks"]
 
 
+class BoardUpdateSerializer(serializers.ModelSerializer):
+  """
+  Serializer for updating a board.
+
+  Accepts a list of user IDs for input ('members') and returns fully nested user information ('members_data', 'owner_data') in the response.
+  """
+  members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
+  members_data = UserProfileSerializer(source="members", many=True, read_only=True)
+  owner_data = UserProfileSerializer(source="owner", read_only=True)  
+
+  class Meta:
+    model = Board
+    fields = ["id", "title", "owner_data", "members_data", "members"]
+
+
 
   

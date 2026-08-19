@@ -3,7 +3,7 @@ from django.db.models import Q, Count, Prefetch
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 
-from .serializers import BoardSerializer, BoardDetailSerializer
+from .serializers import BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer
 from .permissions import IsBoardOwnerOrMember
 from ..models import Board
 from tasks_app.models import Task
@@ -20,6 +20,8 @@ class BoardViewSet(viewsets.ModelViewSet):
     """Define which serializer should be used for each action."""
     if self.action == "retrieve":
       return BoardDetailSerializer
+    elif self.action in ["update", "partial_update"]:
+      return BoardUpdateSerializer
     return BoardSerializer
 
   def get_queryset(self):
@@ -46,6 +48,7 @@ class BoardViewSet(viewsets.ModelViewSet):
       return Board.objects.prefetch_related("members", Prefetch("tasks", queryset=tasks_with_comments))
     
     return Board.objects.all()
+
 
 
 
