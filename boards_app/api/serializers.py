@@ -75,5 +75,8 @@ class BoardUpdateSerializer(serializers.ModelSerializer):
     fields = ["id", "title", "owner_data", "members_data", "members"]
 
 
+class EmailCheckSerializer(serializers.Serializer):
+  """Serializer for checking if email is already registered to a user."""
+  email = serializers.EmailField(required=True)
 
   

@@ -1,12 +1,19 @@
 from django.db.models import Q, Count, Prefetch
+from django.contrib.auth import get_user_model
 
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer
+from .serializers import BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, EmailCheckSerializer
 from .permissions import IsBoardOwnerOrMember
 from ..models import Board
+
 from tasks_app.models import Task
+from auth_app.api.serializers import UserProfileSerializer
+
+User = get_user_model()
 
 class BoardViewSet(viewsets.ModelViewSet):
   """
@@ -48,6 +55,33 @@ class BoardViewSet(viewsets.ModelViewSet):
       return Board.objects.prefetch_related("members", Prefetch("tasks", queryset=tasks_with_comments))
     
     return Board.objects.all()
+
+
+class EmailCheckView(APIView):
+  """View to return user information (id, email, fullname) based on the email."""
+  permission_classes = [IsAuthenticated]
+
+  def get(self, request, format=None):
+        """
+        Check if an email exists and return user details.
+
+        Expects 'email' as a query paramater.
+        """
+        serializer = EmailCheckSerializer(data=request.query_params)
+
+        if serializer.is_valid():
+          validated_email = serializer.validated_data["email"]
+          found_user = User.objects.filter(email=validated_email).first()
+          if found_user:
+            user_serializer = UserProfileSerializer(found_user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+          else:
+            return Response({"detail": "Email not found. The email address does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
+
 
 
 
