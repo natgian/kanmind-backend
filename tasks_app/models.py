@@ -31,10 +31,10 @@ class Task(models.Model):
     return self.title
 
 
-  class Comment(models.Model):
-    """Model representing a comment."""
-    task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="comments")
-    created_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="authored_comments")
-    content = models.TextField(max_length=500)
+class Comment(models.Model):
+  """Model representing a comment."""
+  task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="comments")
+  created_at = models.DateTimeField(auto_now_add=True)
+  author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="authored_comments")
+  content = models.TextField(max_length=500)
 
