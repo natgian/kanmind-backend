@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 from .serializers import BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, EmailCheckSerializer
 from .permissions import IsBoardOwnerOrMember
@@ -59,7 +58,7 @@ class BoardViewSet(viewsets.ModelViewSet):
 
 class EmailCheckView(APIView):
   """View to return user information (id, email, fullname) based on the email."""
-  permission_classes = [IsAuthenticated]
+  permission_classes = [permissions.IsAuthenticated]
 
   def get(self, request, format=None):
         """
