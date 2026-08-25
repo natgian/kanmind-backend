@@ -18,8 +18,8 @@ class Task(models.Model):
     HIGH = "high", "High"
 
   title = models.CharField(max_length=100)
-  description = models.TextField(blank=True, null=True)
-  due_date = models.DateField(blank=True, null=True)
+  description = models.TextField()
+  due_date = models.DateField()
   status = models.CharField(max_length=15, choices=StatusChoices.choices, default=StatusChoices.TO_DO)
   priority = models.CharField(max_length=10, choices=PriorityChoices.choices, default=PriorityChoices.LOW)
 
