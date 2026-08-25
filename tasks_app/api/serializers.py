@@ -31,15 +31,9 @@ class TaskCreateAndUpdateSerializer(serializers.ModelSerializer):
     fields = ["board", "title", "description", "status", "priority", "assignee_id", "reviewer_id", "due_date"]
 
   def validate_board(self, value):
-    """Ensures that the board cannot be changed and the user is a member of the board."""
-    user = self.context["request"].user
-
+    """Ensures that the board cannot be changed while updating a task."""
     if self.instance and self.instance.board != value:
       raise serializers.ValidationError("The board for this task cannot be changed.")
-    
-    if not value.members.filter(id=user.id).exists():
-      raise serializers.ValidationError("You are not a member of this board.")
-
     return value
 
 
