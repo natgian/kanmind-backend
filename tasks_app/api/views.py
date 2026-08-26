@@ -50,3 +50,34 @@ class TaskViewSet(viewsets.ModelViewSet):
     response_serializer = TaskDetailSerializer(annotated_task, context={"request": request})
     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
+  def update(self, request, *args, **kwargs):
+    """Update an existing task."""
+    task = self.get_object()
+    write_serializer = self.get_serializer(task, data=request.data, partial=True)
+    write_serializer.is_valid(raise_exception=True)
+    updated_task = write_serializer.save()
+
+    annotated_task = self.get_queryset().get(id=updated_task.id)
+    response_serializer = TaskDetailSerializer(annotated_task, context={"request": request})
+    response_data = response_serializer.data
+
+    if "comments_count" in response_data:
+      del response_data["comments_count"]
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+#   {
+#   "title": "Code-Review abschließen",
+#   "description": "Den PR fertig prüfen und Feedback geben",
+#   "status": "done",
+#   "priority": "high",
+#   "assignee_id": 13,
+#   "reviewer_id": 1,
+#   "due_date": "2025-02-28"
+# }
+
