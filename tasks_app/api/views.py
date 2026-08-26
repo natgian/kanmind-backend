@@ -31,8 +31,14 @@ class TaskViewSet(viewsets.ModelViewSet):
 
   def get_queryset(self):
     """Return tasks only for boards where the current user is a member."""
+    base_queryset = Task.objects.annotate(annotated_comments_count=Count("comments", distinct=True)).distinct()
+
+    # For actions or individual object, allow access to all tasks so it can return a clean 403 error
+    if self.action in ["retrieve", "update", "partial_update", "destroy"]:
+      return base_queryset
+    
     user =self.request.user
-    return Task.objects.filter(board__members=user).annotate(annotated_comments_count=Count("comments", distinct=True)).distinct()
+    return base_queryset.filter(board__members=user)
 
   def create(self, request, *args, **kwargs):
     """Create a new task and return full details."""
