@@ -1,7 +1,9 @@
+from django.db.migrations import serializer
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from ..models import Task
@@ -66,18 +68,16 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     return Response(response_data, status=status.HTTP_200_OK)
 
-
-
-
-
-
-#   {
-#   "title": "Code-Review abschließen",
-#   "description": "Den PR fertig prüfen und Feedback geben",
-#   "status": "done",
-#   "priority": "high",
-#   "assignee_id": 13,
-#   "reviewer_id": 1,
-#   "due_date": "2025-02-28"
-# }
-
+  @action(detail=False, methods=["get"], url_path="assigned-to-me")
+  def assigned_to_me(self, request):
+    """List the tasks assigned to the authenticated user."""
+    assigned_tasks = self.get_queryset().filter(assignee=request.user)
+    response_serializer = TaskDetailSerializer(assigned_tasks, many=True, context={"request": request})
+    return Response(response_serializer.data, status=status.HTTP_200_OK)
+  
+  @action(detail=False, methods=["get"], url_path="reviewing")
+  def reviewing(self, request):
+    """List the tasks where the authenticated user is the reviewer."""
+    reviewing_tasks = self.get_queryset().filter(reviewer=request.user)
+    response_serializer = TaskDetailSerializer(reviewing_tasks, many=True, context={"request": request})
+    return Response(response_serializer.data, status=status.HTTP_200_OK)
