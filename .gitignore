@@ -41,6 +41,8 @@ htmlcov
 .idea/
 *.swp
 *.swo
+*.pyi
+py.typed
 
 # macOS
 .DS_Store
