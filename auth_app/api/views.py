@@ -1,26 +1,25 @@
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from .serializers import RegistrationSerializer, LoginSerializer
 
-class RegistrationView(APIView):
+class RegistrationView(GenericAPIView):
   """API endpoint for creating a new user and returning a token."""
   permission_classes = [AllowAny]
+  serializer_class = RegistrationSerializer
 
   def post(self, request):
     """Handle POST request to create a user."""
-    serializer = RegistrationSerializer(data=request.data)
+    serializer = self.get_serializer(data=request.data)
 
     if serializer.is_valid():
       user = serializer.save()
-
       # Generate token for the new user
       token, created = Token.objects.get_or_create(user=user)
 
-      # Structured response data
       response_data = {
         "token":token.key,
         "fullname": user.fullname,
@@ -31,18 +30,18 @@ class RegistrationView(APIView):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginView(APIView):
+class LoginView(GenericAPIView):
   """API endpoint for user login."""
   permission_classes = [AllowAny]
+  serializer_class = LoginSerializer
 
   def post(self, request, *args, **kwargs):
-    serializer = LoginSerializer(data=request.data, context={"request": request})
+    serializer = self.get_serializer(data=request.data, context={"request": request})
 
     if serializer.is_valid():
       user = serializer.validated_data["user"]
       token, created = Token.objects.get_or_create(user=user)
 
-      # Structured response data
       response_data = {
         "token": token.key,
         "fullname": user.fullname,
@@ -51,4 +50,3 @@ class LoginView(APIView):
       }
       return Response(response_data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
