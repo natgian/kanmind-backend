@@ -127,9 +127,10 @@ STATIC_URL = 'static/'
 # Custom user model configuration
 AUTH_USER_MODEL = "auth_app.CustomUser"
 
-# Temporary fix for local development when opening HTML files directly
+# Temporary fix for local development
 CORS_ALLOWED_ORIGINS = [
-    "null",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
 ]
 
 # Configuration for permission and authentication
