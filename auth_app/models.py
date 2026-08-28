@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from rest_framework.authtoken.models import TokenProxy
 
 class CustomUserManager(BaseUserManager):
     """Custom manager where email is the unique identifier for authentication instead of username."""
@@ -30,7 +31,7 @@ class CustomUser(AbstractUser):
     """
     Custom user model where email is the unique identifier for authentification instead of username.
     
-    Includesa required fullname field.
+    Includes required fullname field.
     """
     username = None
     email = models.EmailField(unique=True)
@@ -44,5 +45,16 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.fullname
+
+
+class CustomToken(TokenProxy):
+    """
+    Represent a proxy token model to display Tokens under the custom User Management section in the Django
+    Admin Panel.
+    """
+    class Meta:
+        proxy = True
+        verbose_name = "Token"
+        verbose_name_plural = "Tokens"
 
 

@@ -2,7 +2,11 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
-from .models import CustomUser
+
+from rest_framework.authtoken.admin import TokenAdmin
+from rest_framework.authtoken.models import TokenProxy
+
+from .models import CustomUser, CustomToken
 
 class CustomUserCreationForm(forms.ModelForm):
     """Custom form for creating a new user in the admin panel."""
@@ -54,4 +58,11 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
+# Unregister the original model from the section in the Django Admin Panel.
+try:
+    admin.site.unregister(TokenProxy)
+except admin.sites.NotRegistered:
+    pass
 
+# Register the custom proxy token model under the User Management section in the Django Admin Panel.
+admin.site.register(CustomToken, TokenAdmin)
