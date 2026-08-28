@@ -38,3 +38,6 @@ class Comment(models.Model):
   author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="authored_comments")
   content = models.TextField(max_length=500)
 
+  class Meta:
+    ordering = ["created_at"]
+

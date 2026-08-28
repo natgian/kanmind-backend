@@ -1,14 +1,14 @@
-from django.db.migrations import serializer
-from django.db.models import Count
 from django.contrib.auth import get_user_model
+from django.db.models import Count
+from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, permissions, status
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ..models import Task
+from ..models import Comment, Task
 from .permissions import IsBoardMember
-from .serializers import TaskDetailSerializer, TaskCreateAndUpdateSerializer
+from .serializers import CommentSerializer, TaskCreateAndUpdateSerializer, TaskDetailSerializer
 
 User = get_user_model()
 
@@ -81,3 +81,29 @@ class TaskViewSet(viewsets.ModelViewSet):
     reviewing_tasks = self.get_queryset().filter(reviewer=request.user)
     response_serializer = TaskDetailSerializer(reviewing_tasks, many=True, context={"request": request})
     return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+
+class CommentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,mixins.DestroyModelMixin, viewsets.GenericViewSet):
+  """
+  ViewSet for handling Comment creation and retrieval.
+  
+  Enforces authentication and board membership for all actions.
+  """
+  permission_classes = [permissions.IsAuthenticated, IsBoardMember]
+  serializer_class = CommentSerializer
+  queryset = Comment.objects.all()
+
+  def perform_create(self, serializer):
+    """Save the comment in the database with the current user as author."""
+    author = self.request.user
+    task_id = self.kwargs.get("task_id")
+    task = get_object_or_404(Task, id=task_id)
+    serializer.save(author=author, task=task)
+
+  def get_queryset(self):
+    """List comments on the current task."""
+    current_task_id = self.kwargs.get("task_id")
+    filtered_queryset = self.queryset.filter(task_id=current_task_id)
+    return filtered_queryset
+  
+

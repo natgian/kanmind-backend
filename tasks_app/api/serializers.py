@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from ..models import Task
+from ..models import Comment, Task
 from auth_app.api.serializers import UserProfileSerializer
 
 User = get_user_model()
@@ -37,4 +37,11 @@ class TaskCreateAndUpdateSerializer(serializers.ModelSerializer):
     return value
 
 
+class CommentSerializer(serializers.ModelSerializer):
+  """Serializer for creating and listing a comment."""
+  author = serializers.ReadOnlyField(source="author.fullname")
 
+  class Meta:
+    model = Comment
+    fields = ["id", "created_at", "author", "content"]
+    read_only_fields = ["id", "created_at"]

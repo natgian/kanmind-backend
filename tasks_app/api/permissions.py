@@ -1,28 +1,34 @@
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
+
 from boards_app.models import Board
+from tasks_app.models import Task
 
 class IsBoardMember(permissions.BasePermission):
-  """
-  Allows access for GET and PATCH requests only if the user is a member of the board.
-
-  - On POST: checks if the user is a member of the sent board 
-  - On GET/PATCH/DELETE: checks if the user is a member in the board from the task
-  """
+  """Allow access only if the user is a board member."""
   def has_permission(self, request, view):
-    """
-    On POST request check if the user is a member of the board with the sent board ID.
-    Raises 404 if board doesn't exist, otherwise returns True if the user is a member.
-    """
-    if request.method == "POST":
-      board_id = request.data.get("board")
-      if not board_id:
-        return True
+    """Check if the user is a board member."""
+    board_id = request.data.get("board")
+    task_id = view.kwargs.get("task_id")
+
+    if request.method == "POST" and board_id:
       board = get_object_or_404(Board, id=board_id)
       return board.members.filter(id=request.user.id).exists()
+    elif task_id:
+      task = get_object_or_404(Task, id=task_id)
+      return task.board.members.filter(id=request.user.id).exists()
     return True
 
   def has_object_permission(self, request, view, obj):
-    """On GET/PATCH/DELETE request check if the user is a member of the board in the current task."""
-    is_member = obj.board.members.filter(id=request.user.id).exists()
-    return is_member
+    """
+    Check if the user has permission to interact with a task or comment.
+    For comments ensure that only the author of the comment can delete it.
+    """
+    if hasattr(obj, "board"):
+      return obj.board.members.filter(id=request.user.id).exists()
+    else:
+      is_board_member = obj.task.board.members.filter(id=request.user.id).exists()
+      if request.method == "DELETE":
+        is_author = obj.author == request.user
+        return is_board_member and is_author
+      return is_board_member
