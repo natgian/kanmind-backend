@@ -94,6 +94,7 @@ A reference map of the REST endpoints exposed by the server:
 |                    | `/api/boards/<id>`               | `GET`    | Retrieve information about a specific board                                            |
 |                    | `/api/boards/<id>/`              | `PATCH`  | Update a board                                                                         |
 |                    | `/api/boards/<id>/`              | `DELETE` | Delete a board                                                                         |
+|                    | `/api/email-check/`              | `GET`    | Check if email is already registered to a user                                         |
 | **Tasks**          | `/api/tasks/`                    | `POST`   | Creates a new task                                                                     |
 |                    | `/api/tasks/assigned-to-me/`     | `GET`    | Retrieve all tasks assigned to the currently authenticated user                        |
 |                    | `/api/tasks/reviewing/`          | `GET`    | Retrieve all tasks for which the currently authenticated user is the reviewer          |
