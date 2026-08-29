@@ -3,12 +3,13 @@ from .models import Board
 
 @admin.register(Board)
 class BoardAdmin(admin.ModelAdmin):
+  """Configuration for Board interface in admin panel."""
   list_display = ("id", "title", "owner")
   list_select_related = ("owner",) 
   list_display_links = ("id", "title") 
   list_filter = ("owner",)
   search_fields = ("title",)
   ordering = ("title",)
-  autocomplete_fields = ('members',)
+  autocomplete_fields = ("members",)
 
 

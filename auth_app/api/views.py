@@ -36,6 +36,7 @@ class LoginView(GenericAPIView):
   serializer_class = LoginSerializer
 
   def post(self, request, *args, **kwargs):
+    """Validate credentials and return an authentication token with user details."""
     serializer = self.get_serializer(data=request.data, context={"request": request})
 
     if serializer.is_valid():

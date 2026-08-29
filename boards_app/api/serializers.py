@@ -14,7 +14,6 @@ class BoardSerializer(serializers.ModelSerializer):
   """
   members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), required=False, write_only=True)
   owner_id = serializers.ReadOnlyField(source="owner.id")
-
   member_count = serializers.ReadOnlyField(source="annotated_member_count")
   ticket_count = serializers.ReadOnlyField(source="annotated_ticket_count")
   tasks_to_do_count = serializers.ReadOnlyField(source="annotated_tasks_to_do_count")

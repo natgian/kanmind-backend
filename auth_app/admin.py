@@ -18,7 +18,6 @@ class CustomUserCreationForm(forms.ModelForm):
 
     def save(self, commit=True):
         """Hash the password before saving the user."""
-
         # Create the user object in the memory
         user = super().save(commit=False)
         # Set the hashed password
@@ -44,7 +43,8 @@ class CustomUserAdmin(UserAdmin):
     """Configuration for CustomUser in admin panel."""
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
-    list_display = ("fullname", "email", "is_staff", "is_active")
+    list_display = ("id", "fullname", "email", "is_staff", "is_active")
+    list_display_links = ("id", "fullname") 
     search_fields = ("fullname", "email")
     ordering = ("fullname",)
 
