@@ -23,7 +23,7 @@ class BoardViewSet(viewsets.ModelViewSet):
   permission_classes = [permissions.IsAuthenticated, IsBoardOwnerOrMember]
 
   def get_serializer_class(self):
-    """Define which serializer should be used for each action."""
+    """Return the appropriate serializer class based on the current action."""
     if self.action == "retrieve":
       return BoardDetailSerializer
     elif self.action in ["update", "partial_update"]:
@@ -35,13 +35,12 @@ class BoardViewSet(viewsets.ModelViewSet):
     Return boards based on the requested action.
     
     If the action is:
-    - 'list': return boards where the user is owner or member, annotated with specific statistics like member and
-    tickets (tasks) counts.
-    - 'retrieve': return all boards to allow permission checks, while prefetching members and tasks for better performance. Tasks are annotated to include the calculated comment counts.
+    - 'list' / 'create': filter boards where the user is the owner or a member. Annotates each board with member, ticket and task-specific counts.
+    - 'retrieve': prefetch members and tasks (including annotated comment counts) for the specific board to optimize performance.
     """
     user = self.request.user
     
-    if self.action == "list":
+    if self.action in ["list", "create"]:
       queryset = Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
       return queryset.annotate(
         annotated_member_count=Count("members", distinct=True),
@@ -52,8 +51,16 @@ class BoardViewSet(viewsets.ModelViewSet):
     elif self.action == "retrieve":
       tasks_with_comments = Task.objects.annotate(annotated_comments_count=Count("comments", distinct=True))
       return Board.objects.prefetch_related("members", Prefetch("tasks", queryset=tasks_with_comments))
-    
     return Board.objects.all()
+
+  def perform_create(self, serializer):
+    """
+    Save the new board instance and reload it with annotated data.
+    
+    Ensures that the response contains the annotated fields calculated in 'get_queryset' immediately after creation.
+    """
+    board = serializer.save()
+    serializer.instance = self.get_queryset().get(pk=board.pk)
 
 
 class EmailCheckView(APIView):
