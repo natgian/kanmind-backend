@@ -53,7 +53,11 @@ class TaskViewSet(viewsets.ModelViewSet):
     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
   def update(self, request, *args, **kwargs):
-    """Update an existing task."""
+    """
+    Update an existing task.
+
+    Return the updated task details excluding 'board' and 'comments_count'.    
+    """
     task = self.get_object()
     write_serializer = self.get_serializer(task, data=request.data, partial=True)
     write_serializer.is_valid(raise_exception=True)
@@ -63,8 +67,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     response_serializer = TaskDetailSerializer(annotated_task, context={"request": request})
     response_data = response_serializer.data
 
-    if "comments_count" in response_data:
-      del response_data["comments_count"]
+    response_data.pop("comments_count", None)
+    response_data.pop("board", None) 
 
     return Response(response_data, status=status.HTTP_200_OK)
 
