@@ -90,7 +90,7 @@ class BoardReadTests(BoardBaseTestCase):
     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-  def test_detail_board_401_fail_not_authorized(self):
+  def test_detail_board_401_fail_not_authenticated(self):
     """Ensure fails with an error 401 if the user is not authenticated."""
     url = reverse("board-detail", kwargs={"pk": self.board_with_member.pk})
         
@@ -111,7 +111,7 @@ class BoardReadTests(BoardBaseTestCase):
 
   def test_detail_board_404_not_found(self):
     """Ensure fails with an error 404 if the board with the given ID does not exist."""
-    url = reverse("board-detail", kwargs={"pk": "100"})
+    url = reverse("board-detail", kwargs={"pk": 99999})
     self.client.credentials(HTTP_AUTHORIZATION="Token " + self.owner_token.key)
         
     response = self.client.get(url)
@@ -143,8 +143,8 @@ class BoardReadTests(BoardBaseTestCase):
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-  def test_email_check_401_fail_not_authorized(self):
-    """Ensure the check fails if the user is not logged in."""
+  def test_email_check_401_fail_not_authenticated(self):
+    """Ensure the email check fails if the user is not authenticated."""
     url = reverse("email-check")
     
     response = self.client.get(url, data={"email": self.owner_user.email})
