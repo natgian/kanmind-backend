@@ -6,7 +6,7 @@ router = routers.SimpleRouter()
 router.register(r"tasks", TaskViewSet, basename="task")
 
 urlpatterns = [
-  path("tasks/<int:task_id>/comments/", CommentViewSet.as_view({"post": "create", "get": "list"})),
-  path("tasks/<int:task_id>/comments/<int:pk>/", CommentViewSet.as_view({"delete": "destroy"})),
+  path("tasks/<int:task_id>/comments/", CommentViewSet.as_view({"post": "create", "get": "list"}), name="task-comments-list"),
+  path("tasks/<int:task_id>/comments/<int:pk>/", CommentViewSet.as_view({"delete": "destroy"}), name="task-comments-detail"),
   path("", include(router.urls))
 ]
